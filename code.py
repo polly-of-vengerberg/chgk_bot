@@ -2,13 +2,12 @@ import requests
 import config
 
 
-def get_id(name: str, surname: str) -> int:
+def get_id(name: str, surname: str) -> list:
     response = requests.get(url=config.url, params={'name': name, 'surname': surname})
     response_j = response.json()
-    if len(response_j) == 0:
-        return 0
-    id_number = response_j[0]['id']
-    return id_number
+    if not response_j:
+        return []
+    return [f"{i['id']} {i['name']} {i.get('patronymic', '')} {i['surname']}".strip() for i in response_j]
 
 
 def get_name(text: str) -> dict:

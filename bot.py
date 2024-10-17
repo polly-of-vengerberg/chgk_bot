@@ -15,21 +15,24 @@ def func_start(message):
 
 @bot.message_handler(content_types=['text'])
 def func_text(message):
-    if code.get_name(message.text) == {}:
-        bot.send_message(message.chat.id, 'Введите и имя, и фамилию.')
-    else:
-        name = code.get_name(message.text)['name']
-        surname = code.get_name(message.text)['surname']
-        id_output(message, name, surname)
+    name_info = code.get_name(message.text)
+    if not name_info:
+        bot.send_message(message.chat.id, messages.msg['not_enough_info'])
+    name, surname = name_info['name'], name_info['surname']
+    id_output(message, name, surname)
 
 
 def id_output(message, name, surname):
     chgk_id = code.get_id(name, surname)
-    if chgk_id == 0:
-        bot.send_message(message.chat.id, 'Игрок не найден')
+    if not chgk_id:
+        bot.send_message(message.chat.id, messages.msg['unfound'])
+    elif len(chgk_id) > 1:
+        bot.send_message(message.chat.id, messages.msg['more_than_one'])
+        for i in chgk_id:
+            bot.send_message(message.chat.id, i)
+        bot.send_message(message.chat.id, messages.msg['next'])
     else:
-        output = f'''Ваш ID: {chgk_id}'''
-        bot.send_message(message.chat.id, output)
+        bot.send_message(message.chat.id, chgk_id[0])
         bot.send_message(message.chat.id, messages.msg['next'])
 
 
